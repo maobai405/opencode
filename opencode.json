@@ -1,0 +1,55 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "byte": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "ByteDance",
+      "options": {
+        "baseURL": "https://ark.cn-beijing.volces.com/api/v3"
+      },
+      "models": {
+        "deepseek-v3-2-251201": {
+          "name": "deepseek-v3-2-251201"
+        },
+      }
+    },
+    "cherry": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Cherry-IN",
+      "options": {
+        "baseURL": "https://open.cherryin.ai/v1"
+      },
+      "models": {
+        "agent/deepseek-v3.2": {
+          "name": "agent/deepseek-v3.2"
+        },
+        "agent/glm-4.6(free)": {
+          "name": "agent/glm-4.6(free)"
+        },
+        "agent/minimax-m2(free)": {
+          "name": "agent/minimax-m2(free)"
+        },
+        "agent/kimi-k2-thinking(free)": {
+        "name": "agent/kimi-k2-thinking(free)"
+        }
+      }
+    },
+  },
+  "permission": {
+    "edit": "allow",
+    "bash": "allow",
+    "webfetch": "allow",
+    "doom_loop": "allow",
+    "external_directory": "allow"
+  },
+  "mcp": {
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp"
+    }
+  },
+  "keybinds": {
+    "command_list": "<leader>p",
+  },
+  "instructions": ["~/.config/opencode/output-styles/engineer-professional.md"],
+}
