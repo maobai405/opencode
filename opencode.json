@@ -5,12 +5,15 @@
       "npm": "@ai-sdk/openai-compatible",
       "name": "ByteDance",
       "options": {
-        "baseURL": "https://ark.cn-beijing.volces.com/api/v3"
+        "baseURL": "https://ark.cn-beijing.volces.com/api/coding/v3"
       },
       "models": {
-        "deepseek-v3-2-251201": {
-          "name": "deepseek-v3-2-251201"
-        },
+        // "deepseek-v3-2-251201": {
+        //   "name": "deepseek-v3-2-251201"
+        // },
+        "ark-code-latest": {
+          "name": "ark-code-latest"
+        }
       }
     },
     "cherry": {
@@ -23,6 +26,9 @@
         "agent/deepseek-v3.2": {
           "name": "agent/deepseek-v3.2"
         },
+        "agent/deepseek-v3.2(free)": {
+          "name": "agent/deepseek-v3.2(free)"
+        },
         "agent/glm-4.6(free)": {
           "name": "agent/glm-4.6(free)"
         },
@@ -30,7 +36,7 @@
           "name": "agent/minimax-m2(free)"
         },
         "agent/kimi-k2-thinking(free)": {
-        "name": "agent/kimi-k2-thinking(free)"
+          "name": "agent/kimi-k2-thinking(free)"
         }
       }
     },
@@ -46,10 +52,20 @@
     "context7": {
       "type": "remote",
       "url": "https://mcp.context7.com/mcp"
+    },
+    "@magicuidesign/mcp": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@magicuidesign/mcp@latest"
+      ],
     }
   },
   "keybinds": {
     "command_list": "<leader>p",
   },
-  "instructions": ["~/.config/opencode/output-styles/engineer-professional.md"],
+  "instructions": [
+    "~/.config/opencode/output-styles/engineer-professional.md"
+  ],
 }
