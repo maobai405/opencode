@@ -1,111 +1,123 @@
 ---
 
-description: 根据 git 改动生成 conventional commit（可选 emoji），必要时建议拆分提交
-model: anthropic/claude-3-5-sonnet-20241022
+description: 仅用 Git 分析改动并自动生成 conventional commit 信息（可选 emoji）；必要时建议拆分提交，默认运行本地 Git 钩子（可 --no-verify 跳过）
 agent: build
-------------
+model: anthropic/claude-3-5-sonnet-20241022
+confirm: true
+argument-hint: "[--no-verify] [--all] [--amend] [--signoff] [--emoji] [--scope <scope>] [--type <type>]"
 
-你是一名严格遵循 **Conventional Commits** 规范的提交信息助手。
-
-请根据以下内容生成高质量的 Git 提交信息（支持可选 emoji、type、scope、amend、signoff 等参数）。
+# allowed-tools: Read(**), Exec(git status, git diff, git add, git restore --staged, git commit, git rev-parse, git config), Write(.git/COMMIT_EDITMSG)
 
 ---
 
-## 输入参数（来自用户命令）
+Analyze the current git repository and produce Conventional Commits-style commit message(s) and an actionable plan to apply them.
 
+Context (these shell commands will be executed and their output injected into the prompt):
+
+* Current repo check: !`git rev-parse --is-inside-work-tree 2>/dev/null || echo "NOT_A_REPO"`
+* Current branch & HEAD: !`git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "UNKNOWN"`
+* Repo state (porcelain): !`git status --porcelain --untracked-files=normal`
+* Staged file list: !`git diff --staged --name-only`
+* Unstaged file list: !`git diff --name-only`
+* Staged diff summary (stat): !`git diff --staged --stat`
+* Recent commit subjects (for language/style signals): !`git log -n 50 --pretty=%s`
+
+User-provided flags (these are passed to the command via $ARGUMENTS):
 $ARGUMENTS
 
----
+TASK — produce the following outputs **in this exact structure**:
 
-## 当前 Git 改动（工作区与暂存区）
+1. QUICK VERDICT (1 line)
 
-使用以下命令读取改动：
+   * One of:
 
-已暂存改动（staged）：
-!`git diff --cached`
+     * "single-commit" (safe to commit all changes as one),
+     * "suggest-split" (recommend splitting into N commits — follow with groups),
+     * "abort-due-to-state" (e.g., conflicts, not a git repo).
 
-未暂存改动（unstaged）：
-!`git diff`
+2. IF abort-due-to-state: short human-friendly reason and explicit steps to resolve.
 
-文件状态：
-!`git status --porcelain`
+3. If single-commit OR suggest-split: produce commit proposal(s).
 
-最近 20 条提交（用于判断语言倾向）：
-!`git log -n 20 --pretty="%s"`
+   For each commit proposal, include:
 
----
+   * Commit label: `Commit #k`
+   * Type & optional scope (e.g., `feat(auth):`), follow Conventional Commits.
+   * Subject (<=72 chars, imperative).
+   * Body: bullet points — motivation, what changed, files/dirs affected, potential risks, tests/verification steps.
+   * BREAKING CHANGE section if applicable.
+   * If `--emoji` appears in $ARGUMENTS, also provide the emoji prefix line (e.g., "emoji: ✨").
+   * Suggested `git` commands to create it (pathspecs + git add + git commit flags). Example:
 
-## 需要你执行的任务
+     ```
+     git add path1 path2
+     git commit -m "feat(scope): subject" -m "body line 1\nbody line 2" [--signoff] [--no-verify-if-specified]
+     ```
 
-1. **判断是否需要拆分提交**
+   If you recommend splitting, group files into coherent pathspecs and label each group with the likely commit type.
 
-   * 根据目录、关注点、类型（feat/fix/docs/refactor/...）为变更分组
-   * 如果你建议拆分：
+4. If `--all` is present in $ARGUMENTS and staged area is empty, include the explicit command we will run:
 
-     * 输出一个清晰的分组列表（每个分组对应的 pathspec）
-     * 然后为每组生成建议的 commit message（不执行实际 commit）
+   * `git add -A` (and mention consequences).
 
-2. **生成 Conventional Commit 格式消息**
+5. If `--amend` is present, produce the amended commit message only (mention the amended commit hash from git rev-parse if available).
 
-   * 自动推断 `type`（feat/fix/docs/refactor/test/chore/...）
-   * 自动使用中文生成 commit 信息
-   * 如用户传入：
+6. SAFETY / CHECKS
 
-     * `--emoji` → 在 type 前添加匹配的 emoji
-     * `--type <type>` → 覆盖自动判断
-     * `--scope <scope>` → 写入头部
-     * `--amend` → 表明此次提交是 amend
-     * `--signoff` → 在末尾添加 Signed-off-by
+   * If detecting rebase/merge/conflict/detached HEAD, set QUICK VERDICT to "abort-due-to-state" and list commands to fix.
+   * If very large diffs (> 300 LOC changed or > 5 top-level directories), prefer "suggest-split".
 
-3. **输出**
+7. OUTPUT FORMATS (for automation)
 
-   * 若无需拆分 → 输出单条提交信息
-   * 若需要拆分 → 输出多条提交草稿
-   * 不直接执行任何 git 命令，仅生成建议的 commit message
+   * A plain-text section delimited by `===COMMIT-MESSAGES===` that lists the exact commit messages to be written to `.git/COMMIT_EDITMSG` (one message per commit, separated by `---COMMIT---`).
+   * A plain-text section delimited by `===ACTIONABLE-CMDS===` containing the exact shell commands to run if the user agrees (one command per line).
 
----
+IMPORTANT:
 
-## Emoji 映射（仅在用户指定 `--emoji` 时启用）
+* Use the injected shell outputs above as evidence. Quote filenames/pathspecs exactly as shown.
+* Keep the subject lines short and imperative. Body lines should be clear and actionable.
+* If repository language or prior commits are mostly non-English, adapt language accordingly (use recent commit subjects as a hint).
+* Always avoid making filesystem changes in this prompt — only produce suggested `git` commands. (OpenCode will run them if the user opts in.)
 
-* ✨ feat：新增功能
-* 🐛 fix：缺陷修复
-* 📝 docs：文档/注释
-* 🎨 style：代码风格
-* ♻️ refactor：重构
-* ⚡️ perf：性能优化
-* ✅ test：测试
-* 🔧 chore：构建/工具/杂务
-* 👷 ci：CI/CD
-* ⏪️ revert：回滚
-* 💥 breaking：破坏性变更
+## Language Detection Rules
 
----
+Before generating any commit messages, detect the preferred commit language:
 
-## 输出格式
+- Analyze the recent commit messages shown above.
+- Determine whether English or Chinese is more frequently used.
+- Use the majority language when generating commit message subjects and bodies.
+- Keep the entire output for each commit in a single consistent language.
+- If no clear majority exists, default to English.
 
-**如果是单次提交：**
+Examples of accepted final structure (abbreviated):
 
-```
-<type>(<scope>): <subject>
+QUICK VERDICT: suggest-split
 
-<body>
+Commit #1
+type(scope): subject
+body...
+files: src/auth/*, tests/auth/*
+commands:
+git add src/auth/* tests/auth/*
+git commit -m "feat(auth): add login flow" -m "..."
 
-<footer: BREAKING CHANGE 或 Signed-off-by>
-```
+Commit #2
+...
 
-**如果是多次提交：**
+===COMMIT-MESSAGES===
+feat(auth): add login flow
 
-按分组输出多个草稿：
-
-```
-### Commit 1（路径：src/...）
-<message>
-
-### Commit 2（路径：tests/...）
-<message>
-```
+* Implement login endpoint and client flow
+* Add unit tests
 
 ---
 
-请现在根据上述规则，为当前仓库生成提交信息。
+fix(ci): adjust lint config
 
+* ...
+
+===ACTIONABLE-CMDS===
+git add src/auth/* tests/auth/*
+git commit -m "feat(auth): add login flow" -m "Implement login endpoint..."
+git add .github/workflows/ci.yml
+git commit -m "fix(ci): adjust lint config"
