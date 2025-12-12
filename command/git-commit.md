@@ -2,7 +2,6 @@
 
 description: 仅用 Git 分析改动并自动生成 conventional commit 信息（可选 emoji）；必要时建议拆分提交，默认运行本地 Git 钩子（可 --no-verify 跳过）
 agent: build
-model: anthropic/claude-3-5-sonnet-20241022
 confirm: true
 argument-hint: "[--no-verify] [--all] [--amend] [--signoff] [--emoji] [--scope <scope>] [--type <type>]"
 
