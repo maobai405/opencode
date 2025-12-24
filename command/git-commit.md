@@ -3,120 +3,65 @@
 description: 仅用 Git 分析改动并自动生成 conventional commit 信息（可选 emoji）；必要时建议拆分提交，默认运行本地 Git 钩子（可 --no-verify 跳过）
 agent: build
 confirm: true
-argument-hint: "[--no-verify] [--all] [--amend] [--signoff] [--emoji] [--scope <scope>] [--type <type>]"
-
-# allowed-tools: Read(**), Exec(git status, git diff, git add, git restore --staged, git commit, git rev-parse, git config), Write(.git/COMMIT_EDITMSG)
 
 ---
 
-Analyze the current git repository and produce Conventional Commits-style commit message(s) and an actionable plan to apply them.
+您是一位严格遵循《Conventional Commits规范》的Git提交消息生成专家。您的职责是分析Git变更，并根据检测到的变更生成合适的提交消息。
 
-Context (these shell commands will be executed and their output injected into the prompt):
+您需要完成以下任务：
 
-* Current repo check: !`git rev-parse --is-inside-work-tree 2>/dev/null || echo "NOT_A_REPO"`
-* Current branch & HEAD: !`git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "UNKNOWN"`
-* Repo state (porcelain): !`git status --porcelain --untracked-files=normal`
-* Staged file list: !`git diff --staged --name-only`
-* Unstaged file list: !`git diff --name-only`
-* Staged diff summary (stat): !`git diff --staged --stat`
-* Recent commit subjects (for language/style signals): !`git log -n 50 --pretty=%s`
+1. **仓库/分支校验**
+   - 通过 `git rev-parse --is-inside-work-tree` 判断是否位于 Git 仓库。
+   - 读取当前分支/HEAD 状态；如处于 rebase/merge 冲突状态，先提示处理冲突后再继续。
 
-User-provided flags (these are passed to the command via $ARGUMENTS):
-$ARGUMENTS
+2. **改动检测**
+   - 用 `git status --porcelain` 与 `git diff` 获取已暂存与未暂存的改动。
+   - 若已暂存文件为 0：
+     - 若传入 `--all` → 执行 `git add -A`。
+     - 否则提示你选择：继续仅分析未暂存改动并给出**建议**，或取消命令后手动分组暂存。
 
-TASK — produce the following outputs **in this exact structure**:
+3. **拆分建议（Split Heuristics）**
+   - 按**关注点**、**文件模式**、**改动类型**聚类（示例：源代码 vs 文档、测试；不同目录/包；新增 vs 删除）。
+   - 若检测到**多组独立变更**或 diff 规模过大（如 > 300 行 / 跨多个顶级目录），建议拆分提交，并给出每一组的 pathspec（便于后续执行 `git add <paths>`）。
 
-1. QUICK VERDICT (1 line)
+4. **提交信息生成（Conventional 规范）**
+   - 自动推断 `type`（`feat`/`fix`/`docs`/`refactor`/`test`/`chore`/`perf`/`style`/`ci`/`revert` …）与可选 `scope`。
+   - 生成消息头：`<emoji> <type>(<scope>)?: <subject>`（首行 ≤ 72 字符，祈使语气）。
+   - 生成消息体：要点列表（动机、实现要点、影响范围、BREAKING CHANGE 如有）。
+   - 使用中文进行 commit 编写。
+   - 将草稿使用 `cat` 命令写入 `.git/COMMIT_EDITMSG`，并用于 `git commit`。
 
-   * One of:
+5. **执行提交**
+   - 单提交场景：`git commit -F .git/COMMIT_EDITMSG`, 执行前需将确认的 commit 草稿写入 `.git/COMMIT_EDITMSG`
+   - 多提交场景（如接受拆分建议）：按分组给出 `git add <paths> && git commit ...` 的明确指令；若允许执行则逐一完成。
 
-     * "single-commit" (safe to commit all changes as one),
-     * "suggest-split" (recommend splitting into N commits — follow with groups),
-     * "abort-due-to-state" (e.g., conflicts, not a git repo).
+6. **安全回滚**
+   - 如误暂存，可用 `git restore --staged <paths>` 撤回暂存（命令会给出指令，不修改文件内容）。
 
-2. IF abort-due-to-state: short human-friendly reason and explicit steps to resolve.
+## Type 与 Emoji 映射
 
-3. If single-commit OR suggest-split: produce commit proposal(s).
+- ✨ `feat`：新增功能
+- 🐛 `fix`：缺陷修复（含 🔥 删除代码/文件、🚑️ 紧急修复、👽️ 适配外部 API 变更、🔒️ 安全修复、🚨 解决告警、💚 修复 CI）
+- 📝 `docs`：文档与注释
+- 🎨 `style`：风格/格式（不改语义）
+- ♻️ `refactor`：重构（不新增功能、不修缺陷）
+- ⚡️ `perf`：性能优化
+- ✅ `test`：新增/修复测试、快照
+- 🔧 `chore`：构建/工具/杂务（合并分支、更新配置、发布标记、依赖 pin、.gitignore 等）
+- 👷 `ci`：CI/CD 配置与脚本
+- ⏪️ `revert`：回滚提交
+- 💥 `feat`：破坏性变更（`BREAKING CHANGE:` 段落中说明）
 
-   For each commit proposal, include:
+## 拆分提交指南：
+1. **不同关注点**：互不相关的功能/模块改动应拆分。
+2. **不同类型**：不要将 `feat`、`fix`、`refactor` 混在同一提交。
+3. **文件模式**：源代码 vs 文档/测试/配置分组提交。
+4. **规模阈值**：超大 diff（示例：>300 行或跨多个顶级目录）建议拆分。
+5. **可回滚性**：确保每个提交可独立回退。
 
-   * Commit label: `Commit #k`
-   * Type & optional scope (e.g., `feat(auth):`), follow Conventional Commits.
-   * Subject (<=72 chars, imperative).
-   * Body: bullet points — motivation, what changed, files/dirs affected, potential risks, tests/verification steps.
-   * BREAKING CHANGE section if applicable.
-   * If `--emoji` appears in $ARGUMENTS, also provide the emoji prefix line (e.g., "emoji: ✨").
-   * Suggested `git` commands to create it (pathspecs + git add + git commit flags). Example:
+## 重要提示：
+- **仅使用 Git**：不调用任何包管理器/构建命令（无 `pnpm`/`npm`/`yarn` 等）。
+- **尊重钩子**：默认执行本地 Git 钩子。
+- **不改源码内容**：命令只读写 `.git/COMMIT_EDITMSG` 与暂存区；不会直接编辑工作区文件。
+- **安全提示**：在 rebase/merge 冲突、detached HEAD 等状态下会先提示处理/确认再继续。
 
-     ```
-     git add path1 path2
-     git commit -m "feat(scope): subject" -m "body line 1\nbody line 2" [--signoff] [--no-verify-if-specified]
-     ```
-
-   If you recommend splitting, group files into coherent pathspecs and label each group with the likely commit type.
-
-4. If `--all` is present in $ARGUMENTS and staged area is empty, include the explicit command we will run:
-
-   * `git add -A` (and mention consequences).
-
-5. If `--amend` is present, produce the amended commit message only (mention the amended commit hash from git rev-parse if available).
-
-6. SAFETY / CHECKS
-
-   * If detecting rebase/merge/conflict/detached HEAD, set QUICK VERDICT to "abort-due-to-state" and list commands to fix.
-   * If very large diffs (> 300 LOC changed or > 5 top-level directories), prefer "suggest-split".
-
-7. OUTPUT FORMATS (for automation)
-
-   * A plain-text section delimited by `===COMMIT-MESSAGES===` that lists the exact commit messages to be written to `.git/COMMIT_EDITMSG` (one message per commit, separated by `---COMMIT---`).
-   * A plain-text section delimited by `===ACTIONABLE-CMDS===` containing the exact shell commands to run if the user agrees (one command per line).
-
-IMPORTANT:
-
-* Use the injected shell outputs above as evidence. Quote filenames/pathspecs exactly as shown.
-* Keep the subject lines short and imperative. Body lines should be clear and actionable.
-* If repository language or prior commits are mostly non-English, adapt language accordingly (use recent commit subjects as a hint).
-* Always avoid making filesystem changes in this prompt — only produce suggested `git` commands. (OpenCode will run them if the user opts in.)
-
-## Language Detection Rules
-
-Before generating any commit messages, detect the preferred commit language:
-
-- Analyze the recent commit messages shown above.
-- Determine whether English or Chinese is more frequently used.
-- Use the majority language when generating commit message subjects and bodies.
-- Keep the entire output for each commit in a single consistent language.
-- If no clear majority exists, default to English.
-
-Examples of accepted final structure (abbreviated):
-
-QUICK VERDICT: suggest-split
-
-Commit #1
-type(scope): subject
-body...
-files: src/auth/*, tests/auth/*
-commands:
-git add src/auth/* tests/auth/*
-git commit -m "feat(auth): add login flow" -m "..."
-
-Commit #2
-...
-
-===COMMIT-MESSAGES===
-feat(auth): add login flow
-
-* Implement login endpoint and client flow
-* Add unit tests
-
----
-
-fix(ci): adjust lint config
-
-* ...
-
-===ACTIONABLE-CMDS===
-git add src/auth/* tests/auth/*
-git commit -m "feat(auth): add login flow" -m "Implement login endpoint..."
-git add .github/workflows/ci.yml
-git commit -m "fix(ci): adjust lint config"
