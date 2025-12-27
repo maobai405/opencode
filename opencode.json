@@ -41,9 +41,9 @@
     }
   },
   "keybinds": {
-    "command_list": "<leader>p",
+    "command_list": "<leader>p"
   },
   "instructions": [
     "~/.config/opencode/output-styles/engineer-professional.md"
-  ],
+  ]
 }
