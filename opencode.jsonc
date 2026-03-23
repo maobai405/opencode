@@ -1,19 +1,92 @@
 {
 	"$schema": "https://opencode.ai/config.json",
 	"provider": {
-		"x-aio": {
+		"llm": {
 			"npm": "@ai-sdk/openai-compatible",
-			// "npm": "@ai-sdk/anthropic",
-			"name": "x-aio",
+			"name": "llm",
 			"options": {
-				"baseURL": "https://code-api.x-aio.com/v1",
-				// "baseURL": "https://code-api.x-aio.com/anthropic/v1",
-				"apiKey": "{env:XAIO_API_KEY}"
+				"baseURL": "http://localhost:8090/v1",
+				"apiKey": "{env:LLM_API_KEY}"
 			},
 			"models": {
-				"Kimi-K2.5": {
+				"gpt-5.4": {
+					"limit": {
+						"context": 1000000,
+						"output": 32000
+					},
+					"modalities": {
+						"input": ["text", "image", "video"],
+						"output": ["text"]
+					},
+					"reasoning": true,
+					"provider": {
+						"npm": "@ai-sdk/openai",
+						"api": ""
+					}
+				},
+				"gpt-5.3-codex": {
 					"limit": {
 						"context": 256000,
+						"output": 32000
+					},
+					"modalities": {
+						"input": ["text", "image", "video"],
+						"output": ["text"]
+					},
+					"reasoning": true,
+					"provider": {
+						"npm": "@ai-sdk/openai",
+						"api": ""
+					}
+				},
+				"gpt-5.3-codex-spark": {
+					"limit": {
+						"context": 256000,
+						"output": 32000
+					},
+					"modalities": {
+						"input": ["text", "image", "video"],
+						"output": ["text"]
+					},
+					"reasoning": true,
+					"provider": {
+						"npm": "@ai-sdk/openai",
+						"api": ""
+					}
+				},
+				"claude-opus-4.6": {
+					"limit": {
+						"context": 200000,
+						"output": 32000
+					},
+					"modalities": {
+						"input": ["text", "image", "video"],
+						"output": ["text"]
+					},
+					"reasoning": true,
+					"provider": {
+						"npm": "@ai-sdk/anthropic",
+						"api": ""
+					}
+				},
+				"claude-sonnet-4.6": {
+					"limit": {
+						"context": 200000,
+						"output": 32000
+					},
+					"modalities": {
+						"input": ["text", "image", "video"],
+						"output": ["text"]
+					},
+					"reasoning": true,
+					"provider": {
+						"npm": "@ai-sdk/anthropic",
+						"api": ""
+					}
+				},
+				"gemini-3.1-pro-preview": {
+					"limit": {
+						"context": 200000,
 						"output": 32000
 					},
 					"modalities": {
@@ -25,7 +98,21 @@
 						"field": "reasoning_content"
 					}
 				},
-				"GLM-4.7": {
+				"gemini-3-flash-preview": {
+					"limit": {
+						"context": 200000,
+						"output": 32000
+					},
+					"modalities": {
+						"input": ["text", "image", "video"],
+						"output": ["text"]
+					},
+					"reasoning": true,
+					"interleaved": {
+						"field": "reasoning_content"
+					}
+				},
+				"glm-5": {
 					"limit": {
 						"context": 200000,
 						"output": 32000
@@ -35,7 +122,7 @@
 						"field": "reasoning_content"
 					}
 				},
-				"GLM-4.7-Flash": {
+				"kimi-k2.5": {
 					"limit": {
 						"context": 200000,
 						"output": 32000
@@ -45,17 +132,7 @@
 						"field": "reasoning_content"
 					}
 				},
-				"GLM-5": {
-					"limit": {
-						"context": 200000,
-						"output": 32000
-					},
-					"reasoning": true,
-					"interleaved": {
-						"field": "reasoning_content"
-					}
-				},
-				"MiniMax-M2.1": {
+				"minimax-m2.5": {
 					"limit": {
 						"context": 192000,
 						"output": 32000
@@ -63,451 +140,6 @@
 					"reasoning": true,
 					"interleaved": {
 						"field": "reasoning_content"
-					}
-				},
-				"MiniMax-M2.5": {
-					"limit": {
-						"context": 192000,
-						"output": 32000
-					},
-					"reasoning": true,
-					"interleaved": {
-						"field": "reasoning_content"
-					}
-				},
-				"XAIO-O-G5-3-Codex": {
-					"limit": {
-						"context": 256000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true,
-					"provider": {
-						"npm": "@ai-sdk/openai",
-						"api": ""
-					}
-				},
-				"XAIO-C-4-6-Opus": {
-					"limit": {
-						"context": 200000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true
-				},
-				"XAIO-O-G5-3-Codex-Spark": {
-					"limit": {
-						"context": 128000,
-						"output": 32000
-					},
-					"reasoning": true,
-					"provider": {
-						"npm": "@ai-sdk/openai",
-						"api": ""
-					}
-				},
-				"XAIO-O-G5-4": {
-					"limit": {
-						"context": 1000000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true,
-					"provider": {
-						"npm": "@ai-sdk/openai",
-						"api": ""
-					}
-				},
-				"XAIO-C-4-5-Sonnet": {
-					"limit": {
-						"context": 200000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true
-				},
-				"XAIO-C-4-5-Opus": {
-					"limit": {
-						"context": 200000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true
-				},
-				"XAIO-C-4-5-Haiku": {
-					"limit": {
-						"context": 200000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true
-				},
-				"XAIO-C-4-6-Sonnet": {
-					"limit": {
-						"context": 200000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true
-				},
-				"GLM-4.6V": {
-					"limit": {
-						"context": 200000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true,
-					"interleaved": {
-						"field": "reasoning_content"
-					}
-				},
-				"XAIO-O-G5-2": {
-					"limit": {
-						"context": 256000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true,
-					"provider": {
-						"npm": "@ai-sdk/openai",
-						"api": ""
-					}
-				},
-				"XAIO-O-G5-2-Codex": {
-					"limit": {
-						"context": 256000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true,
-					"provider": {
-						"npm": "@ai-sdk/openai",
-						"api": ""
-					}
-				},
-				"XAIO-G-3-Flash-Preview": {
-					"limit": {
-						"context": 200000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true,
-					"interleaved": {
-						"field": "reasoning_content"
-					}
-				},
-				"XAIO-G-3-1-Pro-Preview": {
-					"limit": {
-						"context": 200000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true,
-					"interleaved": {
-						"field": "reasoning_content"
-					}
-				},
-				"Qwen3-30B-A3B-Instruct-2507": {
-					"limit": {
-						"context": 256000,
-						"output": 32000
-					}
-				},
-				"Qwen3-30B-A3B-Thinking-2507": {
-					"limit": {
-						"context": 128000,
-						"output": 32000
-					},
-					"reasoning": true
-				},
-				"Qwen3-Coder-30B-A3B-Instruct": {
-					"limit": {
-						"context": 64000,
-						"output": 32000
-					}
-				},
-				"Qwen3-VL-30B-A3B-Instruct": {
-					"limit": {
-						"context": 64000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					}
-				},
-				"Qwen3-VL-235B-A22B-Instruct": {
-					"limit": {
-						"context": 256000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					}
-				},
-				"DeepSeek-V3.2": {
-					"limit": {
-						"context": 128000,
-						"output": 32000
-					}
-				},
-				"DeepSeek-V3.2-Thinking": {
-					"limit": {
-						"context": 128000,
-						"output": 32000
-					},
-					"reasoning": true,
-					"interleaved": {
-						"field": "reasoning_content"
-					}
-				},
-				"XAIO-O-G5-1": {
-					"limit": {
-						"context": 256000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true,
-					"provider": {
-						"npm": "@ai-sdk/openai",
-						"api": ""
-					}
-				},
-				"XAIO-O-G5-1-Codex": {
-					"limit": {
-						"context": 256000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true,
-					"provider": {
-						"npm": "@ai-sdk/openai",
-						"api": ""
-					}
-				},
-				"XAIO-O-G5": {
-					"limit": {
-						"context": 256000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true,
-					"provider": {
-						"npm": "@ai-sdk/openai",
-						"api": ""
-					}
-				},
-				"XAIO-O-G5-Codex": {
-					"limit": {
-						"context": 256000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true,
-					"provider": {
-						"npm": "@ai-sdk/openai",
-						"api": ""
-					}
-				},
-				"XAIO-O-G5-1-Codex-Mini": {
-					"limit": {
-						"context": 256000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true,
-					"provider": {
-						"npm": "@ai-sdk/openai",
-						"api": ""
-					}
-				},
-				"XAIO-O-G5-1-Codex-Max": {
-					"limit": {
-						"context": 256000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true,
-					"provider": {
-						"npm": "@ai-sdk/openai",
-						"api": ""
-					}
-				},
-				"Qwen3-Max": {
-					"limit": {
-						"context": 256000,
-						"output": 32000
-					}
-				},
-				"Qwen3-Max-Thinking": {
-					"limit": {
-						"context": 256000,
-						"output": 32000
-					}
-				},
-				"Qwen3-Flash": {
-					"limit": {
-						"context": 256000,
-						"output": 32000
-					}
-				},
-				"Qwen3-Flash-Thinking": {
-					"limit": {
-						"context": 256000,
-						"output": 32000
-					}
-				},
-				"Qwen3-VL-Embedding-8B": {
-					"limit": {
-						"context": 64000,
-						"output": 32000
-					}
-				},
-				"Qwen3-Coder-Flash": {
-					"limit": {
-						"context": 256000,
-						"output": 32000
-					}
-				},
-				"Qwen3-Coder-Plus": {
-					"limit": {
-						"context": 1000000,
-						"output": 32000
-					}
-				},
-				"Qwen3.5-Plus": {
-					"limit": {
-						"context": 1000000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true
-				},
-				"Qwen3.5-Flash": {
-					"limit": {
-						"context": 1000000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true
-				},
-				"Qwen3.5-397B-A17B": {
-					"limit": {
-						"context": 256000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true
-				},
-				"Qwen3.5-122B-A10B": {
-					"limit": {
-						"context": 256000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true
-				},
-				"Qwen3.5-35B-A3B": {
-					"limit": {
-						"context": 256000,
-						"output": 32000
-					},
-					"modalities": {
-						"input": ["text", "image", "video"],
-						"output": ["text"]
-					},
-					"reasoning": true
-				}
-			}
-		},
-		"GGBOOM": {
-			"npm": "@ai-sdk/openai",
-			"name": "GGBOOM",
-			"options": {
-				"baseURL": "https://ai.qaq.al",
-				"apiKey": ""
-			},
-			"models": {
-				"gpt-5-4": {
-					"limit": {
-						"context": 1050000,
-						"output": 128000
-					},
-					"options": {
-						"store": false
-					},
-					"variants": {
-						"low": {},
-						"medium": {},
-						"high": {},
-						"xhigh": {}
 					}
 				}
 			}
@@ -539,15 +171,25 @@
 				"npx",
 				"-y",
 				"@modelcontextprotocol/server-filesystem",
-				"/Users/maobai"
+				"{env:HOME}"
 			]
 		},
 		"github": {
 			"enabled": true,
-			"type": "remote",
-			"url": "https://api.githubcopilot.com/mcp",
-			"headers": {
-				"Authorization": "Bearer {env:GITHUB_TOKEN}"
+			"type": "local",
+			"command": [
+				"docker",
+				"run",
+				"-i",
+				"--rm",
+				"-e",
+				"GITHUB_PERSONAL_ACCESS_TOKEN",
+				"-e",
+				"GITHUB_TOOLSETS=all",
+				"ghcr.io/github/github-mcp-server"
+			],
+			"environment": {
+				"GITHUB_PERSONAL_ACCESS_TOKEN": "{env:GITHUB_TOKEN}"
 			}
 		},
 		"chrome-devtools": {
@@ -556,5 +198,5 @@
 			"command": ["npx", "-y", "chrome-devtools-mcp@latest"]
 		}
 	},
-	"plugin": ["oh-my-opencode"]
+	"plugin": ["oh-my-opencode@latest"]
 }

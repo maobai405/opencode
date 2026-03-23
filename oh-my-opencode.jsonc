@@ -2,60 +2,60 @@
 	"$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
 	"agents": {
 		"sisyphus": {
-			"model": "x-aio/XAIO-O-G5-4"
+			"model": "llm/gpt-5.4"
 		},
 		"hephaestus": {
-			"model": "x-aio/XAIO-O-G5-4"
+			"model": "llm/gpt-5.3-codex"
 		},
 		"oracle": {
-			"model": "x-aio/XAIO-O-G5-4"
+			"model": "llm/gpt-5.4"
 		},
 		"librarian": {
-			"model": "x-aio/Kimi-K2.5"
+			"model": "llm/minimax-m2.5"
 		},
 		"explore": {
-			"model": "x-aio/Kimi-K2.5"
+			"model": "llm/minimax-m2.5"
 		},
 		"multimodal-looker": {
-			"model": "XAIO-G-3-Flash-Preview"
+			"model": "llm/gpt-5.3-codex"
 		},
 		"prometheus": {
-			"model": "x-aio/Kimi-K2.5"
+			"model": "llm/claude-opus-4.6"
 		},
 		"metis": {
-			"model": "x-aio/Kimi-K2.5"
+			"model": "llm/claude-opus-4.6"
 		},
 		"momus": {
-			"model": "x-aio/XAIO-O-G5-2"
+			"model": "llm/gpt-5.4"
 		},
 		"atlas": {
-			"model": "x-aio/Kimi-K2.5"
+			"model": "llm/claude-opus-4.6"
 		}
 	},
 	"categories": {
 		"visual-engineering": {
-			"model": "x-aio/XAIO-G-3-Pro-Preview"
+			"model": "llm/gemini-3.1-pro"
 		},
 		"ultrabrain": {
-			"model": "x-aio/XAIO-O-G5-4"
+			"model": "llm/gpt-5.4"
 		},
 		"deep": {
-			"model": "x-aio/XAIO-O-G5-4"
+			"model": "llm/gpt-5.3-codex"
 		},
 		"artistry": {
-			"model": "x-aio/XAIO-G-3-Pro-Preview"
+			"model": "llm/gemini-3.1-pro"
 		},
 		"quick": {
-			"model": "x-aio/Kimi-K2.5"
+			"model": "llm/minimax-m2.5"
 		},
 		"unspecified-low": {
-			"model": "x-aio/Kimi-K2.5"
+			"model": "llm/claude-sonnet-4.6"
 		},
 		"unspecified-high": {
-			"model": "x-aio/XAIO-O-G5-4"
+			"model": "llm/claude-opus-4.6"
 		},
 		"writing": {
-			"model": "x-aio/Kimi-K2.5"
+			"model": "llm/gemini-3-flash"
 		}
 	}
 }
