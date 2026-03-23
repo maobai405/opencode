@@ -2,12 +2,12 @@
 name: git-commit
 description: 分析Git变更并自动生成符合规范的提交消息
 agent: build
-model: x-aio/Kimi-K2.5
+model: llm/gpt-5.4
 interaction: chat
 opts:
   adapter:
-    name: x-aio
-    model: Kimi-K2.5
+    name: llm
+    model: gpt-5.4
   alias: git-commit
   auto_submit: true
   is_slash_cmd: true
